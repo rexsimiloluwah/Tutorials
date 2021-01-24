@@ -54,6 +54,7 @@
         }
         button:hover{
             opacity: 1;
+            transform: translateY(5px);
         }
         .result__container{
             display: none;
@@ -82,14 +83,20 @@
                 <input type = "text" placeholder="Paste Long URL" name="longUrl" id = "longUrl" required/>
                 <input type = "text" placeholder="Enter Custom code, max 8 characters (OPTIONAL)" name="customCode" id="customCode" maxlength="8"/>
                 <button type="submit">Shorten</button>
-                <div class = "result__container">
-                    <div class = "shorturl">
-                    </div>
-                    <div>
-                        <button onclick = "copyLink()">Copy Link</button>
-                    </div>
-                </div>
             </form>
+
+            <div>
+                <p>Read article on <a href="https://simiokunowo.hashnode.dev/build-a-url-shortener-with-fastapi-mongodb-and-python">Hashnode</a></p>
+                <p>Built with ❤️ by <a href="https://simiokunowo.netlify.app">Similoluwa Okunowo</a></p>
+            </div>
+
+            <div class = "result__container">
+                <div class = "shorturl">
+                </div>
+                <div>
+                    <button onclick = "copyLink()">Copy Link</button>
+                </div>
+            </div>
         </div>
     </section>
 
@@ -98,7 +105,7 @@
         const resultContainer = document.querySelector(".result__container");
         const shortUrl = document.querySelector(".shorturl");
 
-        function copyLink() {
+        const copyLink = () => {
             const textField = document.createElement('textarea');
             textField.innerText = document.querySelector('.result__container a').innerText;
             document.body.appendChild(textField);
@@ -107,6 +114,7 @@
             textField.remove();
             alert("Link successfully copied to your clipboard !")
         }
+
         form.addEventListener("submit", (e) => {
             e.preventDefault();
             var formData = new FormData();
