@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FastAPI and MongoDB URL Shortener</title>
+    <style>
+        *{
+            box-sizing: border-box;
+            padding: 0;margin: 0;
+        }
+        body{
+            background: #7ad164;
+        }
+
+        .main{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            font-family: Trebuchet MS,Liberation Sans,DejaVu Sans,sans-serif;
+        }
+        @media (max-width : 1024px){
+            .app__container{
+                width: 95%;
+            }
+        }
+        h1{
+            font-size: 45px;
+            color: #124f02;
+        }
+        form{
+            margin: 1rem auto;
+        }
+        input{
+            width: 100%;
+            margin: .5rem 0;
+            border: 1px solid #124f02;
+            padding: 1rem;
+            outline: none;
+        }
+        button{
+            color: #FFF;
+            background: #124f02;
+            width: 100%;
+            border-radius: 10px;
+            padding: 1rem 2rem;
+            border: none;
+            box-shadow: none;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: .3s ease-in-out all;
+        }
+        button:hover{
+            opacity: 1;
+        }
+        .result__container{
+            display: none;
+            justify-content: space-between;
+            align-items: center;
+            margin: 1rem auto;
+            background: #fff;
+            padding: 1rem;
+            border-radius: 10px;
+        }
+        @media(max-width : 768px){
+            .result__container{
+                flex-direction: column;
+            }
+        }
+
+    </style>
+</head>
+<body>
+    
+    <section class = "main">
+        <div class = "app__container">
+            <h1 class = "app__header">FastAPI and MongoDB URL Shortener</h1>
+            <p>Shorten your links, boost your brand.</p>
+            <form id = "form">
+                <input type = "text" placeholder="Paste Long URL" name="longUrl" id = "longUrl" required/>
+                <input type = "text" placeholder="Enter Custom code, max 8 characters (OPTIONAL)" name="customCode" id="customCode" maxlength="8"/>
+                <button type="submit">Shorten</button>
+                <div class = "result__container">
+                    <div class = "shorturl">
+                    </div>
+                    <div>
+                        <button onclick = "copyLink()">Copy Link</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </section>
+
+    <script>
+        const form = document.getElementById("form");
+        const resultContainer = document.querySelector(".result__container");
+        const shortUrl = document.querySelector(".shorturl");
+
+        function copyLink() {
+            const textField = document.createElement('textarea');
+            textField.innerText = document.querySelector('.result__container a').innerText;
+            document.body.appendChild(textField);
+            textField.select();
+            document.execCommand('copy');
+            textField.remove();
+            alert("Link successfully copied to your clipboard !")
+        }
+        form.addEventListener("submit", (e) => {
+            e.preventDefault();
+            var formData = new FormData();
+            formData.append("longUrl", e.target.longUrl.value);
+            formData.append("customCode", e.target.customCode.value);
+            let data = {}
+            for(let pair of formData.entries()){
+                data[pair[0]] = pair[1]
+            }
+
+            console.log(data)
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", "/api/v1/shorten", true);
+            // Set the request header
+            xhr.setRequestHeader("Content-Type", "application/json");
+            xhr.onreadystatechange = function() { 
+                if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                    console.log("Done")
+                }
+            }
+
+            xhr.onload = function () {
+                const response = JSON.parse(this.responseText);
+                console.log(this.status);
+                console.log(response);
+                if(this.status ==200){
+                    resultContainer.style.display = "flex";
+                    shortUrl.innerHTML = `SHORT URL :- <a href=${response.shortUrl}>${response.shortUrl}</a>`
+                }
+                else{
+                    alert(`An error occurred, ${response.detail}`)
+                }
+            };
+
+            xhr.send(JSON.stringify(data));
+            
+        })
+    </script>
+</body>
+</html>
